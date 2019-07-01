@@ -1,3 +1,4 @@
+const Product = require('../models/product');
 
 exports.getIndex = (req, res, next) => {
     res.status(200).json({

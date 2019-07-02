@@ -15,7 +15,7 @@ exports.addProduct = (req, res, next) => { //same as Create Post
         console.log(result);
         res.status(201).json({
             message: 'Product created successfully',
-            post: result
+            product: result
         })
     })
     .catch(err => {
@@ -47,4 +47,27 @@ exports.updateProduct = (req, res, next) => {
         .catch(err => {
             console.log(err)
         })
+}
+
+exports.deleteProduct = (req, res, next) => {
+    const prodId = req.params.prodId;
+    console.log(prodId)
+    Product
+        .findById(prodId)
+        .then(product => {
+           if(!product) {
+                const error = new Error('Product not found')
+                error.statusCode = 404;
+                throw error;
+            }    
+            return Product.findByIdAndRemove(prodId)
+        })
+        .then( result => {
+            res.status(200).json({message: 'Product deleted'});
+        })
+        .catch( err => {
+            console.log(err);
+        })
+
+
 }

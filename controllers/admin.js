@@ -12,7 +12,7 @@ exports.addProduct = (req, res, next) => {
     throw error;
   }
 
-  const imageUrl = req.file.path;
+  const imageUrl = req.file.path.replace("\\", "/");
   const title = req.body.title;
   const price = req.body.price;
   const description = req.body.description;
@@ -48,7 +48,7 @@ exports.updateProduct = (req, res, next) => {
   let imageUrl = req.body.image;
 
   if (req.file) {
-    imageUrl = req.file.path;
+    imageUrl = req.file.path.replace("\\", "/");
   }
   if (!imageUrl) {
     const error = new Error('No file picked.');
@@ -83,7 +83,7 @@ exports.updateProduct = (req, res, next) => {
     });
 };
 
-exports.deletePost = (req, res, next) => {
+exports.deleteProduct = (req, res, next) => {
   const prodId = req.params.prodId;
   Product.findById(prodId)
     .then(product => {

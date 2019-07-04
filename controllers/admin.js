@@ -15,12 +15,14 @@ exports.addProduct = (req, res, next) => {
   const imageUrl = req.file.path.replace("\\", "/");
   const title = req.body.title;
   const price = req.body.price;
+  const category = req.body.category;
   const description = req.body.description;
   const product = new Product({
     title: title,
     price: price,
     description: description,
     imageUrl: imageUrl,
+    category: category
   });
   product
     .save()
@@ -45,6 +47,7 @@ exports.updateProduct = (req, res, next) => {
   const title = req.body.title;
   const description = req.body.description;
   const price = req.body.price;
+  const category = req.body.category;
   let imageUrl = req.body.image;
 
   if (req.file) {
@@ -69,6 +72,7 @@ exports.updateProduct = (req, res, next) => {
       product.imageUrl = imageUrl;
       product.description = description;
       product.price = price;
+      product.category = category;
 
       return product.save();
     })

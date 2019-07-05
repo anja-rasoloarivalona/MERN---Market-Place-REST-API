@@ -12,6 +12,7 @@ const app = express();
 /*----------ROUTES----------------*/
 const shopRoutes = require('./routes/shop');
 const adminRoutes = require('./routes/admin');
+const authRoutes = require('./routes/auth');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -50,6 +51,7 @@ app.use(
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/admin', adminRoutes)
+app.use('/auth', authRoutes)
 app.use('/', shopRoutes)
 
 

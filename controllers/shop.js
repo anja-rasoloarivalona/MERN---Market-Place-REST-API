@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 
 exports.getIndex = (req, res, next) => {
-    Product.find()
+    Product.find().sort({ createdAt: -1})
     .then(products =>{
         res
             .status(200)

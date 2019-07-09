@@ -29,7 +29,7 @@ exports.getProduct = (req, res, next) => {
                 throw err
             }
 
-            res.status(200).json({message:'Product feeched', product: prod})
+            res.status(200).json({message:'Product fetched', product: prod})
         })
         .catch(err => {
             if(!err.statusCode){

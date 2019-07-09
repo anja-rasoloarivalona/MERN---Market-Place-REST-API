@@ -2,7 +2,23 @@ const fs = require('fs');
 const path = require('path');
 
 const Product = require('../models/product');
+const User = require('../models/user');
 
+exports.getProducts = (req, res, next) => {
+  Product.find()
+  .then(products => {
+    res 
+      .status(200)
+      .json({message: 'Fetched amdin products', products: products})
+  })
+  .catch(err => {
+    if(!err.statusCode){
+      err.statusCode= 500;
+    }
+    next(err)
+  })
+
+}
 
 exports.addProduct = (req, res, next) => {
 
@@ -17,20 +33,31 @@ exports.addProduct = (req, res, next) => {
   const price = req.body.price;
   const category = req.body.category;
   const description = req.body.description;
+  let creator;
   const product = new Product({
     title: title,
     price: price,
     description: description,
     imageUrl: imageUrl,
-    category: category
+    category: category,
+    creator: req.userId
   });
   product
     .save()
     .then(result => {
+     return User.findById(req.userId)
+    })
+    .then( user => {
+      creator = user;
+      user.products.push(product);
+      return user.save();     
+    }) 
+    .then( result => {
       res.status(201).json({
         message: 'Post created successfully!',
-        product: result
-      });
+        product: product,
+        creator: {_id: creator._id, name: creator.name}
+      })
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -65,6 +92,12 @@ exports.updateProduct = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
+      if(product.creator.toString() !== req.userId){
+        const error = new Error('Not authorized');
+        error.statusCode = 403;
+        throw error;
+      }
+
       if (imageUrl !== product.imageUrl) {
         clearImage(product.imageUrl);
       }
@@ -96,7 +129,11 @@ exports.deleteProduct = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
-      // Check logged in user
+      if(product.creator.toString() !== req.userId){
+        const error = new Error('Not authorized');
+        error.statusCode = 403;
+        throw error;
+      }
       clearImage(product.imageUrl);
       return Product.findByIdAndRemove(prodId);
     })

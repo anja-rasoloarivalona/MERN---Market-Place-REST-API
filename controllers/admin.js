@@ -5,7 +5,8 @@ const Product = require('../models/product');
 const User = require('../models/user');
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  
+  Product.find({ creator: req.userId})
   .then(products => {
     res 
       .status(200)
@@ -142,7 +143,8 @@ exports.deleteProduct = (req, res, next) => {
     })
     .then( user => {
       user.products.pull(prodId);
-      return user.save()     
+      return user.save()
+     
     })
     .then(result => {
       console.log(result);

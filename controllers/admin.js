@@ -138,6 +138,13 @@ exports.deleteProduct = (req, res, next) => {
       return Product.findByIdAndRemove(prodId);
     })
     .then(result => {
+    return User.findById(req.userId)  
+    })
+    .then( user => {
+      user.products.pull(prodId);
+      return user.save()     
+    })
+    .then(result => {
       console.log(result);
       res.status(200).json({ message: 'Product Deleted' });
     })

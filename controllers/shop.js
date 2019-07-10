@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 
 
 exports.getIndex = (req, res, next) => {
+    
+    console.log(req.params.price)
+
     Product.find().sort({ createdAt: -1})
     .then(products =>{
         res

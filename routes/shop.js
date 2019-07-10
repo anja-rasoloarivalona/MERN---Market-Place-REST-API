@@ -5,7 +5,7 @@ const shopController = require('../controllers/shop');
 
 
 
-router.get('/', shopController.getIndex);
+router.get('/:price', shopController.getIndex);
 router.get('/:category', shopController.getProductByCategory);
 router.get('/:category/:prodId', shopController.getProduct);
 

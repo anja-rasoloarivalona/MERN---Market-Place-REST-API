@@ -18,6 +18,24 @@ exports.getIndex = (req, res, next) => {
     })
 }
 
+exports.getProductByCategory = (req, res, next) => {
+    const category = req.params.category;
+    Product
+    .find({category: category})
+    .sort({ createdAt: -1})
+    .then(products =>{
+        res
+            .status(200)
+            .json({message: 'Fetched products successfully.', products: products})
+    })
+    .catch(err =>{
+        if(!err.statusCode){
+            err.statusCode = 500;
+        }
+        next(err)
+    })
+}
+
 exports.getProduct = (req, res, next) => {
     const prodId = req.params.prodId;
     const ID = mongoose.Types.ObjectId(prodId);

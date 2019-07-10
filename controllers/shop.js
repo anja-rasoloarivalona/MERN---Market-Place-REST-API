@@ -8,9 +8,7 @@ exports.getIndex = (req, res, next) => {
     let price = req.params.price;
     let min = price.split('&&')[0]
     let max = price.split('&&')[1]
-
     let sort;
-
     if(req.params.sort === 'latest'){
         sort = {createdAt: -1}
     }
@@ -40,10 +38,27 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getProductByCategory = (req, res, next) => {
+    let price = req.params.price;
+    let min = price.split('&&')[0]
+    let max = price.split('&&')[1]
+
+    let sort;
+    if(req.params.sort === 'latest'){
+        sort = {createdAt: -1}
+    }
+    if(req.params.sort === 'low_to_high'){
+        sort = {price: 1}
+    }
+    if(req.params.sort === 'high_to_low'){
+        sort = {price: -1}
+    }
+
     const category = req.params.category;
     Product
-    .find({category: category})
-    .sort({ createdAt: -1})
+    .find(
+        {category: category, price: {$gt: min, $lt: max} }
+    )
+    .sort(sort)
     .then(products =>{
         res
             .status(200)

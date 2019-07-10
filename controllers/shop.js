@@ -4,10 +4,16 @@ const mongoose = require('mongoose');
 
 
 exports.getIndex = (req, res, next) => {
-    
-    console.log(req.params.price)
+    let price = req.params.price;
+    let min = price.split('&&')[0]
+    let max = price.split('&&')[1]
+    console.log('min', min, 'max', max)
 
-    Product.find().sort({ createdAt: -1})
+    Product
+    .find({
+        price: {$gt: min, $lt: max}
+    })
+    .sort({ createdAt: -1})
     .then(products =>{
         res
             .status(200)

@@ -51,9 +51,16 @@ exports.getIndex = (req, res, next) => {
 }
 
 exports.getProductByCategory = (req, res, next) => {
+    let category = req.params.category;
     let price = req.params.price;
-    let min = price.split('&&')[0]
-    let max = price.split('&&')[1]
+    let min = price.split('&&')[0];
+    let max = price.split('&&')[1];
+
+    console.log(category);
+
+    const currentPage = req.query.page || 1;
+    const perPage = 5;
+    let totalProducts;
 
     let sort;
     if(req.params.sort === 'latest'){
@@ -66,16 +73,25 @@ exports.getProductByCategory = (req, res, next) => {
         sort = {price: -1}
     }
 
-    const category = req.params.category;
+    
     Product
     .find(
         {category: category, price: {$gt: min, $lt: max} }
     )
     .sort(sort)
+    .countDocuments()
+    .then( count => {
+        totalProducts = count;
+        return Product.find({category: category, price: {$gt: min, $lt: max} })
+            .skip((currentPage - 1) * perPage) /*If 1st page , skip nothing - If 2nd page, skip (2 - 1) * 5 = 5 first products */
+            .limit(perPage)
+    })
     .then(products =>{
         res
             .status(200)
-            .json({message: 'Fetched products successfully.', products: products})
+            .json({message: 'Fetched products successfully.',
+                 products: products,
+                 totalProducts: totalProducts})
     })
     .catch(err =>{
         if(!err.statusCode){

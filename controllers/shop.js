@@ -5,6 +5,10 @@ const mongoose = require('mongoose');
 
 exports.getIndex = (req, res, next) => {
 
+    const currentPage = req.query.page || 1;
+    const perPage = 5;
+    let totalProducts;
+
     let price = req.params.price;
     let min = price.split('&&')[0]
     let max = price.split('&&')[1]
@@ -24,10 +28,19 @@ exports.getIndex = (req, res, next) => {
         price: {$gt: min, $lt: max}
     })
     .sort(sort)
+    .countDocuments()
+    .then( count => {
+        totalProducts = count;
+        return Product.find()
+            .skip((currentPage - 1) * perPage) /*If 1st page , skip nothing - If 2nd page, skip (2 - 1) * 5 = 5 first products */
+            .limit(perPage)
+    })
     .then(products =>{
         res
             .status(200)
-            .json({message: 'Fetched products successfully.', products: products})
+            .json({message: 'Fetched products successfully.', 
+                   products: products,
+                   totalProducts: totalProducts})
     })
     .catch(err =>{
         if(!err.statusCode){

@@ -6,7 +6,9 @@ const User = require('../models/user');
 
 exports.getProducts = (req, res, next) => {
   
-  Product.find({ creator: req.userId})
+  Product
+  .find({ creator: req.userId})
+  .sort({createdAt: -1})
   .then(products => {
     res 
       .status(200)

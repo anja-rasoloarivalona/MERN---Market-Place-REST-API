@@ -26,12 +26,12 @@ exports.getIndex = (req, res, next) => {
     Product
     .find({
         price: {$gt: min, $lt: max}
-    })
-    .sort(sort)
+    })   
     .countDocuments()
     .then( count => {
         totalProducts = count;
         return Product.find()
+            .sort(sort)
             .skip((currentPage - 1) * perPage) /*If 1st page , skip nothing - If 2nd page, skip (2 - 1) * 5 = 5 first products */
             .limit(perPage)
     })
@@ -78,11 +78,12 @@ exports.getProductByCategory = (req, res, next) => {
     .find(
         {category: category, price: {$gt: min, $lt: max} }
     )
-    .sort(sort)
     .countDocuments()
     .then( count => {
         totalProducts = count;
-        return Product.find({category: category, price: {$gt: min, $lt: max} })
+        return Product
+            .find({category: category, price: {$gt: min, $lt: max} })
+            .sort(sort)
             .skip((currentPage - 1) * perPage) /*If 1st page , skip nothing - If 2nd page, skip (2 - 1) * 5 = 5 first products */
             .limit(perPage)
     })

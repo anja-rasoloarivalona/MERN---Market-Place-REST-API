@@ -30,7 +30,8 @@ exports.getIndex = (req, res, next) => {
     .countDocuments()
     .then( count => {
         totalProducts = count;
-        return Product.find()
+        return Product
+            .find({price: {$gt: min, $lt: max}})
             .sort(sort)
             .skip((currentPage - 1) * perPage) /*If 1st page , skip nothing - If 2nd page, skip (2 - 1) * 5 = 5 first products */
             .limit(perPage)

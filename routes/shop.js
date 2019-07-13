@@ -10,6 +10,4 @@ router.get('/:category/:price/:sort', shopController.getProductByCategory);
 router.get('/:prodId', shopController.getProduct);
 
 
-
-
 module.exports = router;

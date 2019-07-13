@@ -23,25 +23,39 @@ exports.getIndex = (req, res, next) => {
         sort = {price: -1}
     } 
 
+    let priceMax;
+    let priceMin;
+
     Product
     .find({
-        price: {$gt: min, $lt: max}
+        price: {$gte: min, $lte: max}
     })   
     .countDocuments()
     .then( count => {
         totalProducts = count;
         return Product
-            .find({price: {$gt: min, $lt: max}})
-            .sort(sort)
-            .skip((currentPage - 1) * perPage) /*If 1st page , skip nothing - If 2nd page, skip (2 - 1) * 5 = 5 first products */
-            .limit(perPage)
+                .find()
+                .sort({price: 1})        
+    })
+    .then(products => {
+        priceMin = products[0].price;
+        priceMax = products[products.length - 1].price;
+        return Product
+                .find({price: {$gte: min, $lte: max}})
+                .sort(sort)
+                .skip((currentPage - 1) * perPage) /*If 1st page , skip nothing - If 2nd page, skip (2 - 1) * 5 = 5 first products */
+                .limit(perPage)
     })
     .then(products =>{
+        console.log('price min', priceMin)
+        console.log('price max', priceMax)
         res
             .status(200)
             .json({message: 'Fetched products successfully.', 
                    products: products,
-                   totalProducts: totalProducts})
+                   totalProducts: totalProducts,
+                   priceMin: priceMin,
+                   priceMax: priceMax})
     })
     .catch(err =>{
         if(!err.statusCode){
@@ -56,8 +70,7 @@ exports.getProductByCategory = (req, res, next) => {
     let price = req.params.price;
     let min = price.split('&&')[0];
     let max = price.split('&&')[1];
-
-    console.log(category);
+    let productsFound = [];
 
     const currentPage = req.query.page || 1;
     const perPage = 5;
@@ -72,28 +85,35 @@ exports.getProductByCategory = (req, res, next) => {
     }
     if(req.params.sort === 'high_to_low'){
         sort = {price: -1}
-    }
+    };
 
-    
     Product
-    .find(
-        {category: category, price: {$gt: min, $lt: max} }
-    )
-    .countDocuments()
+    .countDocuments({category: category, price: {$gte: min, $lte: max} })
     .then( count => {
         totalProducts = count;
         return Product
-            .find({category: category, price: {$gt: min, $lt: max} })
+            .find({category: category, price: {$gte: min, $lte: max} })
             .sort(sort)
             .skip((currentPage - 1) * perPage) /*If 1st page , skip nothing - If 2nd page, skip (2 - 1) * 5 = 5 first products */
             .limit(perPage)
     })
     .then(products =>{
+        productsFound = products;
+
+       return  Product
+                .find({category: category})
+                .sort({price: 1})  
+          
+    })
+    .then( products => {
         res
-            .status(200)
-            .json({message: 'Fetched products successfully.',
-                 products: products,
-                 totalProducts: totalProducts})
+        .status(200)
+        .json({message: 'Fetched products successfully.',
+             products: productsFound,
+             totalProducts: totalProducts,
+             minPrice: products[0].price,
+             maxPrice: products[products.length - 1].price })
+             next() 
     })
     .catch(err =>{
         if(!err.statusCode){

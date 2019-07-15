@@ -6,6 +6,8 @@ const multer = require('multer');
 const uuidv4 = require('uuid/v4');
 const path = require('path');
 const app = express();
+const helmet = require('helmet');
+const compression = require('compression');
 
 
 
@@ -41,6 +43,9 @@ const fileFilter = (req, file, cb) => {
 /*--------MIDDLEWARES----------*/
 
 
+app.use(helmet());
+app.use(compression());
+
 app.use('*', cors())
 
 app.use((req, res, next) => {
@@ -70,11 +75,12 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-    .connect('mongodb+srv://anja:anjanirina@cluster0-wijrw.mongodb.net/shop')
+//    .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-wijrw.mongodb.net/shop`)
+    .connect(`mongodb+srv://anja:anjanirina@cluster0-wijrw.mongodb.net/shop`)
     .then(result =>{
         console.log('connected')
-        app.listen(8000)
+        app.listen(process.env.PORT || 8000)
     })
     .catch(err => 
         console.log(err)
-    );
+   );

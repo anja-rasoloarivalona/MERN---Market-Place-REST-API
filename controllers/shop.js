@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 exports.getIndex = (req, res, next) => {
 
     const currentPage = req.query.page || 1;
-    const perPage = 5;
+    const perPage = 10;
     let totalProducts;
 
     let price = req.params.price;

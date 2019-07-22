@@ -4,6 +4,7 @@ const router = express.Router();
 const shopController = require('../controllers/shop');
 
 
+router.get('/test', shopController.getProductTest);
 
 router.get('/:price/:sort', shopController.getIndex);
 router.get('/:category/:price/:sort', shopController.getProductByCategory);

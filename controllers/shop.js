@@ -2,13 +2,36 @@ const Product = require('../models/product');
 const mongoose = require('mongoose');
 
 exports.getProductTest = (req, res, next) => {
+
+    let price = req.params.price;
+
+    
+
+    let priceReq;
+
+    if(!price.includes('undefined')){
+        console.log('price params', price)
+        priceReq = { price: {$gte: price.split('&&')[0], $lte: price.split('&&')[1]} }
+    } else {
+        priceReq = { price: {$gte: 0}}
+    }
+
+    let priceMax;
+    let priceMin;
+
     Product
-    .find()
-    .then(products =>{
+    .find(priceReq)
+    .sort({ price : 1})
+    .then( products => {
+        priceMin = products[0].price;
+        priceMax = products[products.length - 1].price;
+
         res
             .status(200)
             .json({message: 'Fetched products successfully.', 
-                   products: products})
+                   products: products,
+                   priceMin: priceMin,
+                   priceMax: priceMax})
     })
     .catch(err =>{
         if(!err.statusCode){

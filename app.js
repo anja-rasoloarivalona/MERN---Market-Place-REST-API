@@ -74,6 +74,8 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
+
+
 mongoose
 //    .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-wijrw.mongodb.net/shop`)
     .connect(`mongodb+srv://anja:anjanirina@cluster0-wijrw.mongodb.net/shop`)

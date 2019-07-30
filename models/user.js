@@ -30,8 +30,7 @@ const userSchema = new Schema ({
             {
                 product: {
                     type: Schema.Types.ObjectId,
-                    ref: 'Product',
-                    required: true
+                    ref: 'Product'            
                 }
             }
         ],
@@ -42,8 +41,7 @@ const userSchema = new Schema ({
         totalPrice: Number,
         taxRate: {
             type: Number,
-            value: 0.15,
-            required: true
+            value: 0.15
         }
     }
 });
@@ -92,14 +90,15 @@ userSchema.methods.setProductToCart = function(products){
     let subTotalPrice = 0;
     let taxes = 0;
     let totalPrice = 0;
-    let taxRate = this.cart.taxRate.value;
+    let taxRate = 0.15;
 
+    
 
 
 
     updatedProductsInCart.forEach(i => {
         subTotalPrice = subTotalPrice + i.price;
-        updatedCartItems = [...updatedCartItems, i._id]
+        updatedCartItems = [...updatedCartItems, {product: i._id}]
     })
 
     taxes = subTotalPrice * taxRate;

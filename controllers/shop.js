@@ -89,38 +89,39 @@ exports.getProductTest = (req, res, next) => {
 }
 
 exports.setCart = (req, res, next) => {
-
-    console.log('set happenned');
-    
-    let products = req.query.products;
+    let products = JSON.parse(req.body.products);
+    let productsInCart;   
     let userId = req.query.userId;
-    let user;
+    let userConnected;
     let productsIds = [];
-
     products.forEach(product => {
-        let id = product._id.toString()
+        let id = product.productId;
         productsIds = [...productsIds,  mongoose.Types.ObjectId(id) ];
-
     })
 
-    console.log('post cart', products);
     User
     .findById(userId)
     .then(user => {
-        console.log(user);
-        user = user;
-
-      return  Product.find({
-            '_id': { $in: productsIds}
+        userConnected = user;
+        return  Product.find({
+            _id : { $in: productsIds}
         })
     })
     .then( products => {
-        console.log(products);
-        return user.setProductToCart(products)
+        productsInCart = products;
+        return userConnected.setProductToCart(products)
     })
-    .then( result => {
-        console.log(result)
-    })
+    .then( () => {
+        res
+        .status(200)
+        .json({message: 'Set products successfully.', 
+               products: productsInCart,
+               totalProductsCount: userConnected.cart.totalProductsCount,
+               subTotalPrice:  userConnected.cart.subTotalPrice,
+               taxes: userConnected.cart.taxes,
+               totalPrice: userConnected.cart.totalPrice,
+               taxRate: userConnected.cart.taxRate})
+    } )
     .catch(err =>{
         if(!err.statusCode){
             err.statusCode = 500;

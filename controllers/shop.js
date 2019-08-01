@@ -181,6 +181,35 @@ exports.addProductToCart = (req, res, next) => {
     })
 }
 
+exports.deleteProductInCart = (req, res, next) => {
+    const prodId = req.params.prodId;
+    let userId = req.userId;
+    let userConnected
+
+    User
+    .findById(userId)
+    .then(user => {
+        userConnected = user;
+        return Product.findById(prodId)      
+    })
+    .then( product => {
+        return userConnected.deleteProductInCart(product)
+    })
+    .then( () => {
+        res
+        .status(200)
+        .json({ message: 'Product added to cart'})
+    })
+    .catch(err => {
+        if(!err.statusCode){
+            err.statusCode = 500;
+        }
+        next(err)
+    })
+}
+
+
+
 
 exports.getIndex = (req, res, next) => {
 

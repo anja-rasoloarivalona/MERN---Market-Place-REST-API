@@ -62,6 +62,31 @@ userSchema.methods.clearProductsInCart =  function(){
     return this.save()
 }
 
+userSchema.methods.deleteProductInCart = function(product){
+    let productsInCart = this.cart.items;
+    let totalProductsCount = this.cart.totalProductsCount - 1;
+    let subTotalPrice = this.cart.subTotalPrice - product.price;
+    let taxes = subTotalPrice * this.cart.taxRate;
+    let totalPrice = subTotalPrice + taxes;
+    let taxRate = this.cart.taxRate;
+
+
+    let updatedCartItems = productsInCart.filter( prod => prod !== product._id)
+
+    let updatedCart = {
+        ...this.cart,
+        items: updatedCartItems,
+        totalProductsCount: totalProductsCount,
+        subTotalPrice: subTotalPrice,
+        taxes: taxes,
+        totalPrice: totalPrice,
+        taxRate: taxRate
+    }
+
+    this.cart = updatedCart;
+    return this.save()
+}
+
 userSchema.methods.addProductToCart = function(product) {
     let productsInCart = this.cart.items;
     if(productsInCart.length < 1) { /*no products in cart yet*/

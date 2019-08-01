@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const User = require('../models/user');
+const Address = require('../models/address');
 const mongoose = require('mongoose');
 
 exports.getProductTest = (req, res, next) => {
@@ -208,6 +209,61 @@ exports.deleteProductInCart = (req, res, next) => {
     })
 }
 
+
+exports.addUserInfo = (req, res, next) => {
+
+    let userId = req.userId;
+    let userConnected;
+
+
+    const fullname = req.body.fullname;
+    const address1 = req.body.address1;
+    const address2 = req.body.address2;
+    const city = req.body.city;
+    const state = req.body.state;
+    const zip = req.body.zip;
+    const email = req.body.email;
+    const phoneNumber = req.body.phoneNumber;
+
+
+
+    const address = new Address({
+        fullname: fullname,
+        address1: address1,
+        address2: address2,
+        city: city,
+        state: state,
+        zip: zip,
+        email: email,
+        phoneNumber: phoneNumber,
+        creator: userId
+    })
+
+    address
+        .save()
+        .then( () => {
+            return User
+                    .findById(userId)
+        })
+        .then(user => {
+            userConnected = user;
+            userConnected.userInfos.push(address);
+            return user.save()
+        })
+        .then(() => {
+            res.status(201).json({
+                message: 'Address added successfully',
+                address: address,
+                creator: { _id: userConnected._id, name: userConnected.name}
+            })
+        })
+        .catch(err => {
+            if (!err.statusCode) {
+              err.statusCode = 500;
+            }
+            next(err);
+          });
+}
 
 
 

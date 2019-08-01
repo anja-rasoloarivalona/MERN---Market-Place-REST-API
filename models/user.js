@@ -43,7 +43,20 @@ const userSchema = new Schema ({
             type: Number,
             value: 0.15
         }
-    }
+    },
+
+    userInfos: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'UserInfo'
+        }
+    ]
+     
+                
+    
+
+
+
 });
 
 

@@ -46,31 +46,15 @@ const userSchema = new Schema ({
     }
 });
 
-userSchema.methods.addProductToCart = function(product) {
 
-    let productsInCart = this.cart.items;
-    let totalProductsCount = productsInCart.length;
-    let subTotalPrice = this.cart.subTotalPrice;
-    let taxes = this.cart.taxes;
-    let totalPrice = this.cart.totalPrice;
-    let taxRate = this.cart.taxRate.value;
-
-    productsInCart.push({
-        product: product._id
-    })
-
-
-    subTotalPrice = subTotalPrice + product.price;
-    taxes = subTotalPrice * taxRate;
-    totalPrice = subTotalPrice + taxes;
-
+userSchema.methods.clearProductsInCart =  function(){
     let updatedCart = {
-        items: productsInCart,
-        totalProductsCount: totalProductsCount,
-        subTotalPrice: subTotalPrice,
-        taxes: taxes,
-        totalPrice: totalPrice,
-        taxRate: taxRate
+        items: [],
+        totalProductsCount: 0,
+        subTotalPrice: 0,
+        taxes: 0,
+        totalPrice: 0,
+        taxRate: 0.15
     }
 
     this.cart = updatedCart;
@@ -78,7 +62,76 @@ userSchema.methods.addProductToCart = function(product) {
     return this.save()
 }
 
+userSchema.methods.addProductToCart = function(product) {
+
+
+
+    let productsInCart = this.cart.items;
+
+    if(productsInCart.length < 1) { /*no products in cart yet*/
+
+        let cart = {
+            items: [],
+            totalProductsCount: 0,
+            subTotalPrice: 0,
+            taxes: 0,
+            totalPrice: 0,
+            taxRate: 0.15
+        }
+
+
+        let updatedCart = {
+            ...cart,
+            items: [{product: product._id}],
+            totalProductsCount: 1,
+            subTotalPrice: product.price,
+            taxes: product.price * 0.15,
+            totalPrice: product.price * 1.15,
+            taxRate: 0.15
+        }
+
+        console.log('after updating cart items no product', updatedCart)
+
+        this.cart = updatedCart;
+
+        return this.save()
+       
+
+    } else {
+        let totalProductsCount = productsInCart.length + 1;
+        let subTotalPrice = this.cart.subTotalPrice;
+        let taxes = this.cart.taxes;
+        let totalPrice = this.cart.totalPrice;
+        let taxRate = 0.15;
+
+        productsInCart.push({
+            product: product._id
+        })
+
+        subTotalPrice = subTotalPrice + product.price;
+        taxes = subTotalPrice * taxRate;
+        totalPrice = subTotalPrice + taxes;
+
+        let updatedCart = {
+            items: productsInCart,
+            totalProductsCount: totalProductsCount,
+            subTotalPrice: subTotalPrice,
+            taxes: taxes,
+            totalPrice: totalPrice,
+            taxRate: taxRate
+        }
+
+        console.log('after updating cart items with 1', updatedCart)
+
+        this.cart = updatedCart;
+
+        return this.save()
+    }
+}
+
 userSchema.methods.setProductToCart = function(products){
+
+    console.log('on set', products)
 
 
     let updatedProductsInCart = products;
@@ -93,30 +146,31 @@ userSchema.methods.setProductToCart = function(products){
     let taxRate = 0.15;
 
     
+  
+        updatedProductsInCart.forEach(i => {
+            subTotalPrice = subTotalPrice + i.price;
+            updatedCartItems = [...updatedCartItems, {product: i._id}]
+        })
+    
+        taxes = subTotalPrice * taxRate;
+        totalPrice = subTotalPrice + taxes;
+    
+        let updatedCart = {
+            items: updatedCartItems, 
+            totalProductsCount: totalProductsCount,
+            subTotalPrice: subTotalPrice,
+            taxes: taxes,
+            totalPrice: totalPrice,
+            taxRate: taxRate
+        }
+    
+        this.cart = updatedCart;
+        return this.save();
 
 
+    
 
-    updatedProductsInCart.forEach(i => {
-        subTotalPrice = subTotalPrice + i.price;
-        updatedCartItems = [...updatedCartItems, {product: i._id}]
-    })
-
-    taxes = subTotalPrice * taxRate;
-    totalPrice = subTotalPrice + taxes;
-
-    let updatedCart = {
-        items: updatedCartItems,
-
-        totalProductsCount: totalProductsCount,
-        subTotalPrice: subTotalPrice,
-        taxes: taxes,
-        totalPrice: totalPrice,
-        taxRate: taxRate
-    }
-
-    this.cart = updatedCart;
-
-    return this.save();
+    
 
 }
 

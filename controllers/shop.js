@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Address = require('../models/address');
 const mongoose = require('mongoose');
 
+
 exports.getProductTest = (req, res, next) => {
 
     let category = req.query.category;
@@ -87,6 +88,30 @@ exports.getProductTest = (req, res, next) => {
         }
         next(err)
     })
+}
+
+
+exports.getUserAddresses = (req, res, next) => {
+
+    console.log('fetch happening')
+
+    Address
+    .find()
+    .then( addresses => {
+        console.log('get user address', addresses)
+        res
+          .status(200)
+          .json({
+              message: 'Fetched user addresses',
+              addresses: addresses
+          })
+    })
+    .catch(err => {
+        if(!err.statusCode){
+          err.statusCode= 500;
+        }
+        next(err)
+      })
 }
 
 exports.setCart = (req, res, next) => {

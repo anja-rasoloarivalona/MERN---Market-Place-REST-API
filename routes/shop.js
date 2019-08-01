@@ -4,6 +4,7 @@ const router = express.Router();
 const shopController = require('../controllers/shop');
 const isAuth = require('../middleware/is-auth');
 
+router.get('/address', isAuth, shopController.getAddress);
 
 router.get('/test/:price/:sort', shopController.getProductTest);
 
@@ -12,12 +13,15 @@ router.get('/:category/:price/:sort', shopController.getProductByCategory);
 router.get('/:prodId', shopController.getProduct);
 
 
+
+
+
 router.post('/cart', isAuth, shopController.setCart);
 
 router.post('/cart/add-userInfo', isAuth, shopController.addUserInfo);
 
 
-router.get('/cart/address', isAuth, shopController.getUserAddresses)
+
 
 router.post('/cart/add-product/:prodId', isAuth, shopController.addProductToCart);
 router.post('/cart/delete-product/:prodId', isAuth, shopController.deleteProductInCart);

@@ -91,12 +91,9 @@ exports.getProductTest = (req, res, next) => {
 }
 
 
-exports.getUserAddresses = (req, res, next) => {
-
-    console.log('fetch happening')
-
+exports.getAddress = (req, res, next) => {
     Address
-    .find()
+    .find({creator: req.userId})
     .then( addresses => {
         console.log('get user address', addresses)
         res

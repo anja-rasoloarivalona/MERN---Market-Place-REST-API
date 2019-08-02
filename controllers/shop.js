@@ -1,6 +1,7 @@
 const Product = require('../models/product');
 const User = require('../models/user');
 const Address = require('../models/address');
+const Order = require('../models/order');
 const mongoose = require('mongoose');
 
 
@@ -91,11 +92,84 @@ exports.getProductTest = (req, res, next) => {
 }
 
 
+exports.postOrder = (req, res, next) => {
+
+    let userId = req.userId;
+    let userConnected;
+
+    const addressId =  req.body.address;
+
+    let products = JSON.parse(req.body.products);
+
+    const deliveryDate = req.body.deliveryDate;
+    const subTotalPrice = req.body.subTotalPrice;
+    const taxes = req.body.taxes;
+    const deliveryPrice = req.body.deliveryPrice;
+    const totalPrice = req.body.totalPrice;
+    const totalProductsCount = req.body.totalProductsCount
+
+    let productsToOrder = [];
+    let cart = {};
+
+    products.forEach(product => {
+        productsToOrder = [...productsToOrder, {product: product._id}];
+    })
+
+    cart = {
+        items: productsToOrder,
+        subTotalPrice: subTotalPrice,
+        taxes: taxes,
+        deliveryFee: deliveryPrice,
+        totalPrice: totalPrice,
+        totalProductsCount: totalProductsCount
+    }
+
+
+    let creator = userId;
+
+  /*  console.log('creator', creator);
+    console.log('address', addressId)*/
+
+
+
+    const order = new Order({
+        cart: cart,
+        address: addressId,
+        creator: creator,
+        deliveryDate: deliveryDate
+    })
+
+    order
+        .save()
+        .then( () => {
+            return User
+                    .findById(userId)
+        })
+        .then(user => {
+            userConnected = user;
+            userConnected.orders.push(order);
+            return user.save()
+        })
+        .then(() => {
+            res.status(201).json({
+                message: 'Order added successfully'
+            })
+        })
+        .catch(err => {
+            if (!err.statusCode) {
+              err.statusCode = 500;
+            }
+            next(err);
+          });
+
+
+}
+
+
 exports.getAddress = (req, res, next) => {
     Address
     .find({creator: req.userId})
     .then( addresses => {
-        console.log('get user address', addresses)
         res
           .status(200)
           .json({

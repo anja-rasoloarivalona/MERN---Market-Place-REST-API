@@ -101,6 +101,8 @@ exports.postOrder = (req, res, next) => {
 
     let products = JSON.parse(req.body.products);
 
+   
+
     const deliveryDate = req.body.deliveryDate;
     const subTotalPrice = req.body.subTotalPrice;
     const taxes = req.body.taxes;
@@ -112,17 +114,21 @@ exports.postOrder = (req, res, next) => {
     let cart = {};
 
     products.forEach(product => {
-        productsToOrder = [...productsToOrder, {product: product._id}];
+        productsToOrder = [...productsToOrder, product._id];
     })
 
+    
+
     cart = {
-        items: productsToOrder,
+        products: productsToOrder,
         subTotalPrice: subTotalPrice,
         taxes: taxes,
         deliveryFee: deliveryPrice,
         totalPrice: totalPrice,
         totalProductsCount: totalProductsCount
     }
+
+    
 
 
     let creator = userId;
@@ -194,7 +200,11 @@ exports.setCart = (req, res, next) => {
     products.forEach(product => {
         let id = product.productId;
         productsIds = [...productsIds,  mongoose.Types.ObjectId(id) ];
+
+        console.log('set cart products ids', productsIds)
     })
+
+    
 
     User
     .findById(userId)
@@ -250,8 +260,61 @@ exports.clearProductsInCart = (req, res, next) => {
     })
 }
 
+exports.getOrder = (req, res, next ) => {
+    let userOrders = [];
+    let productsIds = [];
+
+    let addressId;
+
+    Order
+        .find({creator: req.userId})
+        .then(orders => {
+            /*FIND ALL THE USER ORDERS*/
+            userOrders = orders;
+            userOrders.forEach( order => {
+                addressId = order.address;
+                order.cart.products.forEach( prod => {
+                    let id = prod._id;
+                    productsIds = [...productsIds, id]
+                    })
+                    
+               Address
+                    .findById(addressId)
+                    .then( address => {
+                        order.address = address;
+                        return  Product
+                                    .find({
+                                        _id : { $in: productsIds}
+                                 }) 
+                    })
+                    .then( products => {
+                        order.cart.products = products
+                    })
+                    .then(() => {
+                        res
+                            .status(200)
+                            .json({ message: 'Fetched Orders', orders: userOrders }) 
+                    })
+                    .catch( err => {
+                        if(!err.statusCode){
+                            err.statusCode = 500
+                        }
+            
+                        next(err)
+                    })
+            })      
+        })
+        .catch( err => {
+            if(!err.statusCode){
+                err.statusCode = 500
+            }
+
+            next(err)
+        })
+}
+
 exports.addProductToCart = (req, res, next) => {
-    const prodId = req.params.prodId;
+    const prodId = req.params.prodId; 
     let userId = req.userId;
 
     let userConnected

@@ -5,6 +5,7 @@ const shopController = require('../controllers/shop');
 const isAuth = require('../middleware/is-auth');
 
 router.get('/address', isAuth, shopController.getAddress);
+router.get('/order', isAuth, shopController.getOrder);
 
 router.get('/test/:price/:sort', shopController.getProductTest);
 

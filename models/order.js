@@ -4,12 +4,11 @@ const Schema = mongoose.Schema;
 
 const orderSchema = new Schema ({
     cart: {
-        items: [
+        
+        products: [
             {
-                products: {
-                    type: Schema.Types.ObjectId,
-                    ref: 'Product'
-                }
+                type: Schema.Types.ObjectId,
+                ref: 'Product'
             }
         ],
         totalProductsCount: Number,
@@ -20,19 +19,19 @@ const orderSchema = new Schema ({
 
     },
 
-    address: [
+    address: 
         {
             type: Schema.Types.ObjectId,
             ref: 'UserInfo'
         }
-    ],
+    ,
 
-    creator: [
+    creator: 
         {
             type: Schema.Types.ObjectId,
             ref: 'User'
         }
-    ],
+    ,
 
     deliveryDate: String
 }, {timestamps: true})

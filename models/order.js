@@ -1,14 +1,19 @@
 const mongoose = require('mongoose');
+const shortid = require('shortid')
 
 const Schema = mongoose.Schema;
 
 const orderSchema = new Schema ({
+    shortId: {
+        type: String,
+        default: shortid.generate
+    },
+
     cart: {
-        
-        products: [
+
+        items: [
             {
-                type: Schema.Types.ObjectId,
-                ref: 'Product'
+                product: {type: Object}
             }
         ],
         totalProductsCount: Number,
@@ -21,8 +26,7 @@ const orderSchema = new Schema ({
 
     address: 
         {
-            type: Schema.Types.ObjectId,
-            ref: 'UserInfo'
+            type: Object,
         }
     ,
 

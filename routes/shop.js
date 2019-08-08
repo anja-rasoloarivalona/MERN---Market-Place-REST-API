@@ -9,8 +9,6 @@ router.get('/order', isAuth, shopController.getOrder);
 
 router.get('/test/:price/:sort', shopController.getProductTest);
 
-router.get('/:price/:sort', shopController.getIndex);
-router.get('/:category/:price/:sort', shopController.getProductByCategory);
 router.get('/:prodId', shopController.getProduct);
 
 
